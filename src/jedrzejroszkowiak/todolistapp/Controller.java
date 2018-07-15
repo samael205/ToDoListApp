@@ -69,6 +69,7 @@ public class Controller {
 //        todoItems.add(item5);
         listContextMenu = new ContextMenu();
         MenuItem deleteMenuItem = new MenuItem("Delete");
+        MenuItem editMenuItem = new MenuItem("Edit");
 
         deleteMenuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -79,7 +80,17 @@ public class Controller {
 
             }
         });
+
+        editMenuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                TodoItem item = todoListView.getSelectionModel().getSelectedItem();
+                showEditItemDialog();
+            }
+        });
+
         listContextMenu.getItems().addAll(deleteMenuItem);
+        listContextMenu.getItems().addAll(editMenuItem);
 
         todoListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TodoItem>() {
             @Override
@@ -204,6 +215,39 @@ public class Controller {
         if(result.isPresent() && result.get() == ButtonType.OK) {
             DialogController controller = fxmlLoader.getController();
             TodoItem newItem = controller.processResults();
+//            todoListView.getItems().add(newItem); //this statement added only one next ToDoItem to ListView
+//            todoListView.getItems().setAll(TodoData.getInstance().getTodoItems()); // this statement added overwrite all ToDoItems
+            todoListView.getSelectionModel().select(newItem);
+        }
+    }
+
+    @FXML
+    public void showEditItemDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.initOwner(mainBorderPane.getScene().getWindow());
+        dialog.setTitle("Edit TodoItem");
+        dialog.setHeaderText("Change information in fields");
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource("todoItemDialog.fxml"));
+        try {
+            dialog.getDialogPane().setContent(fxmlLoader.load());
+
+        } catch(IOException e) {
+            System.out.println("Couldn't load the dialog");
+            e.printStackTrace();
+            return;
+        }
+        DialogController controller = fxmlLoader.getController();
+        TodoItem selectedItem = todoListView.getSelectionModel().getSelectedItem();
+        controller.fillFields(selectedItem);
+
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
+        dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialog.showAndWait();
+        if(result.isPresent() && result.get() == ButtonType.OK) {
+
+            TodoItem newItem = controller.processEditResults(selectedItem);
 //            todoListView.getItems().add(newItem); //this statement added only one next ToDoItem to ListView
 //            todoListView.getItems().setAll(TodoData.getInstance().getTodoItems()); // this statement added overwrite all ToDoItems
             todoListView.getSelectionModel().select(newItem);

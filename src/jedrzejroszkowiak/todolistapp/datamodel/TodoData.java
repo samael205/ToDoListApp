@@ -38,6 +38,16 @@ public class TodoData {
         }
     }
 
+    public static void editTodoItem(TodoItem item, TodoItem newItem) {
+        if (item != null) {
+//            int position = todoItems.indexOf(item);
+//            todoItems.set(position, newItem);
+            todoItems.remove(item);
+            todoItems.add(newItem);
+        }
+    }
+
+
     public void loadTodoItems() throws IOException {
         todoItems = FXCollections.observableArrayList();
         Path path = Paths.get(filename);

@@ -32,4 +32,24 @@ public class DialogController {
         TodoData.getInstance().addTodoItem(newItem);
         return newItem;
     }
+
+    public void fillFields(TodoItem item) {
+        String shortDescription = item.getShortDescription();
+        String details = item.getDetails();
+        LocalDate deadlineValue = item.getDeadline();
+
+        shortDescriptionField.setText(shortDescription);
+        detailsArea.setText(details);
+        deadlinePicker.setValue(deadlineValue);
+    }
+
+    public TodoItem processEditResults(TodoItem item) {
+        String shortDescription = shortDescriptionField.getText().trim();
+        String details = detailsArea.getText().trim();
+        LocalDate deadlineValue = deadlinePicker.getValue();
+
+        TodoItem newItem = new TodoItem(shortDescription, details, deadlineValue);
+        TodoData.getInstance().editTodoItem(item, newItem);
+        return newItem;
+    }
 }
